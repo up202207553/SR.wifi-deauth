@@ -45,5 +45,6 @@ docker exec client sh -c "ip addr add 10.0.0.2/24 dev wlan1 && ip route add defa
 
 # the attacker is placed in monitor mode
 docker exec attacker sh -c "iw wlan2 set monitor control && ip link set wlan2 up"
+docker exec attacker sh -c "iw wlan2 set channel 6"
 
 # for clean up run sudo modprobe -r mac80211_hwsim
