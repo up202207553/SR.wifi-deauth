@@ -1,24 +1,31 @@
 services:
   ap:
-    image: debian:stable
+    container_name: ap
+    build: .
     privileged: true
     network_mode: none
     volumes:
-      - volumes_ap:/volumes
-    command: ["bash", "-c", "apt-get update && apt-get install -y hostapd iproute2 iputils-ping && hostapd /volumes/hostapd.conf"]
+      - ./volumes_ap:/volumes
+    command: ["bash", "-c", "sleep infinity"]
+    
 
   client:
-    image: debian:stable
+    container_name: client
+    build: .
     privileged: true
     network_mode: none
     volumes:
-      - volumes_client:/volumes
-    command: ["bash", "-c", "apt-get update && apt-get install -y wpasupplicant iproute2 iputils-ping && wpa_supplicant -Dnl80211 -iwlan1 -c /volumes/wpa_supplicant.conf -B"]
+      - ./volumes_client:/volumes
+    command: ["bash", "-c", "sleep infinity"]
+    
   
   attacker:
-    image: debian:stable
+    container_name: attacker
+    build: .
     privileged: true
     network_mode: none
     volumes:
-      - volumes_attacker:/volumes
-    command: ["bash", "-c", "apt-get update && apt-get install -y wpasupplicant iproute2 iputils-ping && wpa_supplicant -Dnl80211 -iwlan1 -c /volumes/wpa_supplicant.conf -B"]
+      - ./volumes_attacker:/volumes
+    command: ["bash", "-c", "sleep infinity"]
+          
+
