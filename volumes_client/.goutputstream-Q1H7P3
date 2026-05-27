@@ -3,5 +3,5 @@ network={
     ssid="TestWiFi"
     psk="supersecretpass"
     key_mgmt=WPA-PSK
-    # ieee80211w=2
+    ieee80211w=2
 }

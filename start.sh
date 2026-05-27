@@ -8,7 +8,7 @@ docker rm -f ap client attacker 2>/dev/null
 docker-compose build
 docker-compose up -d
 
-sleep 5
+sleep 10
 
 # Get container IDs
 AP_PID=$(docker inspect -f '{{.State.Pid}}' ap)
