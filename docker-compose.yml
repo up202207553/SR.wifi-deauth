@@ -27,5 +27,14 @@ services:
     volumes:
       - ./volumes_attacker:/volumes
     command: ["bash", "-c", "sleep infinity"]
+  
+  defender:
+    container_name: defender
+    build: .
+    privileged: true
+    network_mode: none
+    volumes:
+      - ./volumes_defender:/volumes
+    command: ["bash", "-c", "sleep infinity"]
           
 
