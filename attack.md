@@ -66,19 +66,24 @@ Verify each interface is in the expected state.
 ```bash
 # AP should report type AP, channel 6, ssid TestWiFi
 docker exec ap iw dev wlan0 info
+```
 
 ![alt text](images/image1.1.png)
 
+```bash
 # Client should report "Connected to 02:00:00:00:00:00, SSID: TestWiFi"
 docker exec client iw dev wlan1 link
+```
 
 ![alt text](images/image1.2.png)
 
+```bash
 # Attacker should report type monitor, channel 6
 docker exec attacker iw dev wlan2 info
+```
 
 ![alt text](images/image1.3.png)
-```
+
 
 Confirm the aircrack-ng suite is installed inside the attacker:
 
@@ -99,7 +104,7 @@ docker exec client cat /sys/class/net/wlan1/address   # Client MAC  -> 02:00:00:
 
 ## Step 2 — Open two shells in the attacker container
 
-You need **two terminals** inside the attacker.
+You need **two terminals** inside the attacker and **one terminal** inside the client.
 
 **Terminal A** — for `airodump-ng` (runs continuously):
 
@@ -114,6 +119,11 @@ docker exec -it attacker bash
 ```
 
 Also its better to connect to the client docker and pin 10.0.0.1 to see it works and also to be some extra traffic
+```bash
+docker exec -it client bash
+ping 10.0.0.1
+```
+
 
 ---
 
@@ -149,6 +159,13 @@ CH  6 ][ ... ][ WPA handshake: 02:00:00:00:00:00
 ## Step 4 — Send the deauth (the actual attack)
 
 In **Terminal B**:
+
+```bash
+python3 attack.py -a 02:00:00:00:00:00 -c 02:00:00:00:01:00
+``` 
+![alt text](images/image4.3.png)
+
+or 
 
 ```bash
 aireplay-ng --deauth 5 \
