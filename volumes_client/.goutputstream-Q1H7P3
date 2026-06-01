@@ -1,7 +1,0 @@
-ctrl_interface=/var/run/wpa_supplicant
-network={
-    ssid="TestWiFi"
-    psk="supersecretpass"
-    key_mgmt=WPA-PSK
-    ieee80211w=2
-}
