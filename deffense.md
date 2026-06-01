@@ -4,20 +4,9 @@ This guide demonstrates how to configure Protected Management Frames (PMF) in a 
 
 ## Step 1 - Enable PMF on the Access Point
 
-Edit `volumes_ap/hostapd.conf` (or your specific hostapd configuration file) and modify it to include the PMF settings:
+Edit `hostapd.conf` (or your specific hostapd configuration file) and modify it to include the PMF settings:
 
-```conf
-# --- existing WPA2 settings ---
-wpa=2
-wpa_key_mgmt=WPA-PSK-SHA256
-rsn_pairwise=CCMP
-wpa_passphrase=supersecretpass
-ssid=TestWiFi
-channel=6
-
-# --- PMF (802.11w) ---
-ieee80211w=2
-```
+![alt text](images/image1sd.png)
 
 ### Configuration Notes
 
@@ -27,18 +16,9 @@ ieee80211w=2
 
 ## Step 2 - Enable PMF on the Client
 
-Edit `volumes_client/wpa_supplicant.conf` (or your `client.conf`):
+Edit `client.conf` to look like this:
 
-```conf
-network={
-    ssid="TestWiFi"
-    psk="supersecretpass"
-    key_mgmt=WPA-PSK-SHA256
-    proto=RSN
-    pairwise=CCMP
-    ieee80211w=2
-}
-```
+![alt text](images/image2sd.png)
 
 Setting `ieee80211w=2` ensures the client will refuse to connect to any AP that does not offer Protected Management Frames.
 
@@ -61,22 +41,25 @@ You should see `Connected to 02:00:00:00:00:00, SSID: TestWiFi`.
 Verify PMF is actively running on the AP:
 
 ```bash
-docker exec ap hostapd_cli -i wlan0 status | grep -i ieee80211w
+docker exec ap hostapd_cli -i wlan0 get_config
 ```
 
 Expected output:
 
 ```text
-ieee80211w=2
+key_mgmt=WPA-PSK-SHA256
+group_cipher=CCMP
+rsn_pairwise_cipher=CCMP
+pmf=2
 ```
+![alt text](images/image3.1d.png)
 
 Verify PMF is actively running on the client:
 
 ```bash
 docker exec client wpa_cli -i wlan1 status | grep -i pmf
 ```
-
-Expected output: `pmf=2` or similar, depending on the `wpa_supplicant` version.
+![alt text](images/image3.2d.png)
 
 ## Step 4 - Execute the Attack
 

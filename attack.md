@@ -30,6 +30,13 @@ A step-by-step guide for performing a deauthentication attack, capturing a WPA2 
 ---
 
 ## Prerequisites
+Make sure the hostapd.conf looks like this:
+
+![alt text](images/image1s.png)
+
+And the client.conf like this:
+
+![alt text](images/image2s.png)
 
 Start the initialization script:
 
