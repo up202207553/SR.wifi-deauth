@@ -47,7 +47,7 @@ Setting `ieee80211w=2` ensures the client will refuse to connect to any AP that 
 Apply the new configurations by restarting the Docker containers:
 
 ```bash
-docker compose restart ap client
+./start.sh
 ```
 
 Confirm that the client associated successfully:
