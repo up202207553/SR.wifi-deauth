@@ -72,8 +72,6 @@ cd /tmp/capture-pmf
 airodump-ng -c 6 --bssid 02:00:00:00:00:00 -w handshake wlan2
 ```
 
-The AP row should now show the MFP column populated. Depending on your `airodump-ng` version, the cipher column may read `CCMP CMAC` (CMAC is the Broadcast Integrity Protocol cipher used to sign management frames).
-
 In a second attacker terminal, launch the exact same deauthentication attack as before:
 
 ```bash
@@ -105,15 +103,3 @@ Expected result:
 ![alt text](images/image5d.png)
 
 The attack chain is successfully broken.
-
-## Step 6 - Wire-Level Confirmation
-
-Inspect the forged deauth frames in the packet capture to see why the client rejected them:
-
-```bash
-tshark -r /tmp/capture-pmf/handshake-01.cap \
-       -Y "wlan.fc.type_subtype == 0x0c" \
-       -V | grep -E "Protected|MIC|deauth"
-```
-
-A legitimate deauthentication frame from a PMF-enabled AP would have the Protected flag set to `1` and contain a valid MMIC trailer. Because `aireplay-ng`'s spoofed frames lack these cryptographic signatures, the client's 802.11 stack securely discards them.
