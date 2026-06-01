@@ -1,11 +1,7 @@
 from scapy.all import *
 import argparse
 
-ap_mac = "02:00:00:00:00:00"
 
-client_mac = "02:00:00:00:01:00"
-
-interface = "wlan2"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(

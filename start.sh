@@ -4,7 +4,7 @@ sudo modprobe -r mac80211_hwsim
 sudo modprobe mac80211_hwsim radios=4
 
 docker-compose down
-docker rm -f ap client attacker 2>/dev/null
+docker rm -f ap client attacker defender 2>/dev/null
 
 docker-compose build
 docker-compose up -d
@@ -58,4 +58,4 @@ docker exec defender sh -c "iw wlan3 set monitor control && ip link set wlan3 up
 docker exec defender sh -c "iw wlan3 set channel 6"
 
 
-# for clean up run sudo modprobe -r mac80211_hwsim
+
